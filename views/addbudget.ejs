@@ -1,0 +1,33 @@
+<%- include('partials/header'); -%>
+
+<header>
+    <h2>ADD YOUR STARTING BUDGET</h2>
+</header>
+<br>
+<form action="/addbudget" method="post">
+    <label>Insert your starting budget</label>
+    <label for="budget">Budget</label>
+    <input type="number" name="budget" required>
+    <button class="btn"type="submit">Add</button>
+</form>
+<script>
+  const form = document.querySelector('form');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const budget = form.budget.value;
+    try {
+      const res = await fetch('/addbudget', {
+        method: 'POST',
+        body: JSON.stringify({ budget }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      if (data) {
+        location.assign('/expenses');
+      }
+    } catch (err) {
+      console.log(err.message);
+    }
+  });
+</script>
+<%- include('partials/footer'); -%>

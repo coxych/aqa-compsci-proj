@@ -1,0 +1,191 @@
+/* google fonts */
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
+
+
+body{
+  margin: 20px 40px;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+  background: #e7e5e5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4, ul, li, a, p, input, label, button, div, footer{
+  margin: 0;
+  padding: 0;
+  font-family: 'Quicksand', sans-serif;
+  color: #444;
+}
+ul{
+  list-style-type: none;
+}
+a{
+  text-decoration: none;
+}
+nav{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+.hypertext {
+  color: blue;
+}
+nav ul{
+  display: flex;
+  align-items: center;
+}
+nav li{
+  margin-left: 20px;
+}
+nav li a{
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 0.8em;
+  display: block;
+  padding: 10px 16px;
+  letter-spacing: 2px;
+}
+.btn{
+  color: white;
+  border-radius: 36px;  
+  background: #262929;
+  
+}
+.btn:hover{
+  background: #252627;
+}
+form h2{
+  font-size: 2.4em;
+  font-weight: 900;
+  margin-bottom: 40px;
+}
+form{
+  width: 360px;
+  margin: 0 auto;
+  padding: 30px;
+  box-shadow: 1px 2px 3px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  background: white;
+}
+input{
+  padding: 10px 12px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  font-size: 1em;
+  width: 100%;
+}
+label{
+  display: block;
+  margin: 20px 0 10px;
+}
+
+.error{
+  color: #ff4444;
+  margin: 10px 2px;
+  font-size: 0.8em;
+  font-weight: bold;
+}
+header{
+  display: flex;
+  align-items: center;
+}
+header img{
+  width: 250px;
+  margin-right: 40px;
+}
+header h2{
+  font-size: 3em;
+  margin-bottom: 10px;
+}
+header h3{
+  font-size: 1.6em;
+  margin-bottom: 10px;
+  margin-left: 2px;
+  color: #999;
+}
+form .btn{
+  margin-top: 20px;
+  padding: 12px 18px;
+  text-transform: uppercase;
+  font-weight: bold;
+  display: inline-block;
+  font-size: 0.8em;
+}
+
+
+footer{
+  text-align: center;
+  margin-top: 120px;
+  color: #aaa;
+}
+.showingbutton:hover + .listofstuff{
+  max-height: inherit;
+  opacity: 1;
+}
+.scroll-r{
+  background-color: #d8d8d8;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: scroll; /* Add this line to enable vertical scrolling */
+  max-height: 400px;
+}
+.scroll-r li{
+  margin-bottom: 10px;
+  color: rgb(236, 0, 0)
+}
+.scroll-gr{
+  background-color: #d8d8d8;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: scroll; /* Add this line to enable vertical scrolling */
+  max-height: 400px;
+}
+.scroll-gr li{
+  margin-bottom: 10px;
+  color: rgb(22, 255, 33)
+}
+
+.row-layout {
+  display: flex;
+  flex-direction: row; /* Align children horizontally */
+}
+
+.fundBarContainer {
+  width: 100%;
+  background-color: #eee;
+  border-radius: 5px;
+}
+
+.goalBar {
+  height: 20px;
+  background-color: #91ce93;
+  border-radius: 5px;
+  transition: width 0.5s ease-in-out;
+}
+.goalBarContainer {
+  width: 400;
+  background-color: #d8d6d6;
+  border-radius: 5px;
+}
+
+.fundBar {
+  height: 20px;
+  background-color: #4CAF50;
+  border-radius: 5px;
+  transition: width 0.5s ease-in-out;
+}
+
+select {
+  font-size: 1em;
+  width: 100%;
+  text-align: center;
+}
+

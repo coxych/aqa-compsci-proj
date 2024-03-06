@@ -1,0 +1,105 @@
+<%- include('partials/header'); -%>
+<header>
+    <h2>HERE IS THE OVERVIEW OF YOUR ACCOUNT </h2>
+</header>
+<h2>Your current budget: <%= user.budget %> £</h2>
+<br>
+<div class="row-layout">
+    <div class="scroll-r">
+        <h1>Your expenses</h1>
+        <% user.expenses.reverse().forEach((expense) => { %>
+        <li>
+            <p>Amount: <%= expense.amount %> £</p>
+            <p>Date: <%= expense.date %></p>
+            <p>Category: <%= expense.category %></p>
+            <p>Description: <%= expense.description %></p>
+        </li>
+        <% }) %>
+    </div>
+    <div class="scroll-gr">
+        <h1>Your incomes</h1>
+        <% user.incomes.reverse().forEach((income) => { %>
+        <li>
+            <p>Amount: <%= income.amount %> £</p>
+            <p>Date: <%= income.date %></p>
+            <p>Category: <%= income.category %></p>
+            <p>Description: <%= income.description %></p>
+        </li>
+        <% }) %>
+    </div>
+</div>
+
+<div class="row-layout">
+    <div>
+        <h2>Your current funds</h2>
+        <% user.funds.reverse().forEach((fund) => { %>
+        <li>
+          <p>To raise: <%= fund.amount %> £</p>
+          <div class="fundBarContainer" data-name="<%= fund.name %>" data-amount="<%= fund.amount %>" data-raised="<%= fund.raisedAmount %>">
+            <div class="fundBar" style="width: 0%;"></div>
+            <p> <%= fund.name %> and raised: <%= fund.raisedAmount%></p>
+            <p class="excess"></p>
+            <% if (fund.raisedAmount > 0){ %>
+              <button class="btn excess-btn"  data-usid="<%= user._id %>" data-id="<%= fund.id %>" style="display:none">Withdraw fund</button>
+            <% } else { %>
+              <button class="btn delete-btn" data-usid="<%= user._id %>" data-id="<%= fund.id %>">DELETE</button>
+            <% } %>
+          </div>
+          <script>
+            document.addEventListener('DOMContentLoaded', () => {
+              document.querySelectorAll('.fundBarContainer').forEach(container => {
+                const toRaise = parseInt(container.getAttribute('data-amount'), 10);
+                const raised = parseInt(container.getAttribute('data-raised'), 10);
+    
+                const percentageRaised = raised > 0 ? (raised / toRaise) * 100 : 0;
+                if (percentageRaised > 100) {
+                  container.querySelector('.fundBar').style.width = '100%';
+                  container.querySelector('.excess').textContent = `You have raised more than the goal, excess: ${raised - toRaise} £`;
+                  container.querySelector('.excess-btn').style.display = 'block';
+                  document.querySelectorAll('.excess-btn').forEach(button => {
+                      button.addEventListener('click', async function() {
+                      const fundId = this.getAttribute('data-id');
+                      const userId = this.getAttribute('data-usid');
+                      try {
+                          await fetch(`/user/${userId}/fund/${fundId}/withdraw`, {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                          }
+                          }).then(() => {
+                           location.reload();
+                        });
+                      } catch {
+                        console.log('failed to delete withdraw');
+                      }
+                    });
+                  });
+                } else {
+                  container.querySelector('.fundBar').style.width = `${percentageRaised}%`;
+                }
+              });
+              document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                  const fundId = this.getAttribute('data-id');
+                  const userId = this.getAttribute('data-usid');
+                  try {
+                    fetch(`/user/${userId}/fund/${fundId}`, {
+                      method: 'DELETE',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      }
+                    }).then(() => {
+                      location.reload();
+                    });
+                  } catch {
+                    console.log('failed to delete fund');
+                  }
+                });
+              });  
+            });
+          </script>
+        </li>
+        <% }) %>
+      </div>
+</div>
+<%- include('partials/footer'); -%>

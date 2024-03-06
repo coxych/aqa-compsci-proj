@@ -1,0 +1,206 @@
+<%- include('partials/header'); -%>
+
+<header>
+  <h2>HERE YOU CAN MANAGE YOUR GOALS</h2>
+</header>
+<div>
+    <h2>How goals work?</h2>
+    <p>Goal includes amount to save and the date until which you want to acomplish this goal.</p>
+    <p>We will provide you with data and advices on how to reach desired</p>
+</div>
+<br>
+<h2>Your current budget: <%= user.budget %> £</h2>
+<br>
+<% if (user.subs.length > 0 && user.salaries.length > 0 && user.goals.length == 0) { %>
+<h2>Add your first goal</h2>  
+<br>
+<form action="/addgoals" method="post">
+  <label for="amount">Amount to save</label>
+  <input type="number" name="amount" step="0.01" required>
+  <label for="date">Date until which to save</label>
+  <input type="date" name="date" value="<%= new Date().toISOString().split('T')[0] %>" required>
+  <button class="btn" type="submit">Add</button>
+</form>
+<script>
+      const form = document.querySelector('form');
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const date = form.date.value;
+          const amount = form.amount.value;
+          try {
+            const res = await fetch('/addgoals', {
+              method: 'POST',
+              body: JSON.stringify({ amount, date }),
+              headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await res.json();
+            if (data) {
+              location.assign('/goals');
+            }
+          } catch (err) {
+            console.log(err.message);
+          }
+        });
+</script>
+<% } else {%>
+  <p>To use goals you should have at least 1 subscription and 1 source of constant income</p>
+<% } %>
+
+<div>
+  <% user.goals.forEach((goal) => { %>
+  <h2>Your current goal</h2>
+  <li>
+    <p>Amount to save: <%= goal.amount %> £</p>
+    <p>Date until which to save: <%= goal.date %></p>
+    <div class="row-layout">
+
+
+    <button class="btn delete-btn" 
+    <% if (goal.savedAmount == 0) {%>
+      style="display: block"
+    <% } else { %> 
+      style="display: none"
+    <% } %>
+    data-usid="<%= user._id %>" data-id="<%= goal.id %>">
+    DELETE</button>
+
+
+    <button class="btn calculate-btn"
+    <% if (!goal.updated) {%>
+      style="display: block"
+    <%} else {%>
+      style="display: none"
+    <%}%>
+    data-usid="<%= user._id %>" data-id="<%= goal.id %>">
+    CALCULATE</button>
+
+    <button class="btn hideshow-btn" data-usid="<%= user._id %>">
+      <% if (!user.ShowGoal) { %>
+        SHOW AT THE TOP</button>
+      <% } else { %>
+        HIDE</button>
+      <% } %>
+
+    <button class="btn withdraw-btn"
+    <% if (goal.savedAmount > 0) { %>
+      style="display: block"
+    <% } else { %>
+      style="display: none"
+    <% } %>
+    data-usid="<%= user._id %>" data-id="<%= goal.id %>">
+    WITHDRAW</button>
+    </div>
+    <% if (goal.updated) {%>
+      <p>We analysed your goal:</p>
+      <% if (goal.calcValue > 0) {%>
+        <p>You can easily reach your goal in saving if you wont spend more than <%= goal.calcValue %> per day</p>
+        <p>This is approximate calculation without including your expenses</p>
+      <% } else {%>
+        <p> To reach your goal you have to gain at least <%= goal.calcValue * -1 %> £ each day</p>
+        <p>This is approximate calculation without including your expenses</p>
+      <% } %>
+    <% } %>
+    <h1>Amount saved: <%= goal.savedAmount %> £</h1>
+    <form action="/user/${userId}/goal/${goalId}/add" method="post"> 
+      <label for="amount">Amount to add to goal</label>
+      <input type="number" name="amount" step="0.01" required>
+      <button class="btn" type="submit2" data-usid="<%= user._id %>" data-id="<%= goal.id %>">Add</button>
+    </form>
+    <script>
+      const form2 = document.querySelector('form');
+        form2.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const amount = form2.amount.value;
+          const goalId = form2.querySelector('button').getAttribute('data-id');
+          const userId = form2.querySelector('button').getAttribute('data-usid');
+          try {
+            const res = await fetch(`/user/${userId}/goal/${goalId}/add`, {
+              method: 'POST',
+              body: JSON.stringify({ amount }),
+              headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await res.json();
+            if (data) {
+              location.assign('/goals');
+            }
+          } catch (err) {
+            console.log(err.message);
+          }
+        });
+    </script>
+  </li>
+  <% }) %>
+  </div>
+  <script>
+    document.querySelectorAll('.delete-btn').forEach(button => {
+      button.addEventListener('click', async function() {
+        const goalId = this.getAttribute('data-id');
+        const userId = this.getAttribute('data-usid');
+        try {
+          await fetch(`/user/${userId}/goal/${goalId}/delete`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          }).then(() => {
+            location.reload();
+          });
+        } catch {
+          console.log('failed to delete goal');
+        }
+      });
+    });
+    document.querySelector('.calculate-btn').addEventListener('click', async function() {
+      const goalId = this.getAttribute('data-id');
+      const userId = this.getAttribute('data-usid');
+      try {
+        await fetch(`/user/${userId}/goal/${goalId}/calculate`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }).then(() => {
+          location.reload();
+        });
+      } catch {
+        console.log('failed to calculate goal');
+      }
+    });
+    document.querySelector('.withdraw-btn').addEventListener('click', async function() {
+      const goalId = this.getAttribute('data-id');
+      const userId = this.getAttribute('data-usid');
+      try {
+        await fetch(`/user/${userId}/goal/${goalId}/withdraw`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }).then(() => {
+          location.reload();
+        });
+      } catch {
+        console.log('failed to withdraw goal');
+      }
+    });
+    document.querySelector('.hideshow-btn').addEventListener('click', async function() {
+      const userId = this.getAttribute('data-usid');
+      try {
+        await fetch(`/user/${userId}/hideshowgoal`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        }).then(() => {
+          location.reload();
+        });
+      } catch {
+        console.log('failed to show goal');
+      }
+    })
+  </script>
+
+
+
+
+
+<%- include('partials/footer'); -%>

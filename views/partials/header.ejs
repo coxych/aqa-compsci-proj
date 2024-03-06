@@ -1,0 +1,51 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav>
+    <% if (user && user.ShowGoal == true) { %>
+      <% user.goals.reverse().forEach((goal) => { %>
+        <div class="goalBarContainer" data-amount="<%= goal.amount %>" data-saved="<%= goal.savedAmount %>">
+          <p>Goal progress:  <%=goal.savedAmount%> £ of <%= goal.amount%> £</p>
+          <div class="goalBar" style="width: 0%;">
+          </div>
+        </div>
+      <% }) %>
+    <% } %>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.goalBarContainer').forEach(container => {
+          const toSave = parseInt(container.getAttribute('data-amount'));
+          const saved = parseInt(container.getAttribute('data-saved'));
+          const percentageSaved = (saved / toSave) * 100;
+          if (percentageSaved > 100) {
+            container.querySelector('.goalBar').style.width = '100%';
+          } else {
+          container.querySelector('.goalBar').style.width = `${percentageSaved}%`;
+          }
+        });
+      });
+    </script>
+  </nav>
+  <nav>
+    <h1><a href="/">Finance tracker for students</a></h1>
+    <ul>
+      <% if (user) { %>
+        <li><a href="/overview">Overview</a></li>
+        <li><a href="/advices">Advices</a></li>
+        <li><a href="goals">Goals</a></li>
+        <li><a href="/funds">Funds</a></li>
+        <li><a href="/income">Income</a></li>
+        <li><a href="/expenses">Expenses</a></li>
+        <li><a href="/profile"><%= user.name %>'s Profile</a></li>
+
+      <% } else { %>
+        <li><a href="/login">Log in</a></li>
+        <li><a href="/signup" class="btn">Sign up</a></li>
+      <% } %>
+    </ul>
+  </nav>
