@@ -7,7 +7,7 @@ async function addGoals(userId, goal) {
       const user = await User.findById(userId);
       const goalWithId = {
         ...goal,
-        id: uuidv4(),
+        id: uuidv4(), //unique id creation
         savedAmount: 0,
         calcValue: 0,
         updated: false,
@@ -29,9 +29,10 @@ async function goalsAlgorithm(userId, goal) {
         const user = await User.findById(userId); // Fetch the user from the database
         const goalDate = new Date(goal.date);
         const currentDate = new Date();
+        //calculates difference in days from now to the end date of goal
         const diffTime = Math.abs(goalDate - currentDate);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
+        //gets amount to gain and spend becuase of subs and salaries during this
         let subExpense = 0;
         for (let sub of user.subs) {
             switch (sub.howoften) {
@@ -60,22 +61,24 @@ async function goalsAlgorithm(userId, goal) {
                     break;
             }
         }
+        //netincome during the period
         const netIncome = salaryIncome - subExpense;
         var calcValue = netIncome - goal.amount;
         calcValue /= diffDays;
+        //calcValue is amount to gain every day to meet the goal
 
-        goal.calcValue = parseInt(calcValue);
+        goal.calcValue = parseInt(calcValue); 
         goal.updated = true;
         
         user.goals.forEach(g => {
             if (g.id === goal.id) {
-                g.calcValue = goal.calcValue;
+                g.calcValue = goal.calcValue;//save the amount to the goal objs
                 g.updated = true;
             }
         });
 
         user.markModified('goals');
-        await user.save();
+        await user.save(); //save changes
 
     } catch (err) {
         console.log(err.message);

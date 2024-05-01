@@ -7,6 +7,7 @@
 </head>
 <body>
   <nav>
+    <!-- here we can us -->
     <% if (user && user.ShowGoal == true) { %>
       <% user.goals.reverse().forEach((goal) => { %>
         <div class="goalBarContainer" data-amount="<%= goal.amount %>" data-saved="<%= goal.savedAmount %>">
@@ -34,7 +35,7 @@
   <nav>
     <h1><a href="/">Finance tracker for students</a></h1>
     <ul>
-      <% if (user) { %>
+      <% if (user) { %> <!-- if the user is logged in functionality is revealed -->
         <li><a href="/overview">Overview</a></li>
         <li><a href="/advices">Advices</a></li>
         <li><a href="goals">Goals</a></li>
@@ -43,7 +44,7 @@
         <li><a href="/expenses">Expenses</a></li>
         <li><a href="/profile"><%= user.name %>'s Profile</a></li>
 
-      <% } else { %>
+      <% } else { %> <!-- if the user is not logged in the functionality is hidden -->
         <li><a href="/login">Log in</a></li>
         <li><a href="/signup" class="btn">Sign up</a></li>
       <% } %>

@@ -7,7 +7,7 @@ async function addFunds(userId, fund) {
       const user = await User.findById(userId);
       const fundWithId = {
         ...fund,
-        id: uuidv4(), // Add a unique ID to the salary object
+        id: uuidv4(), // here a unique ID is also usefull 
         raisedAmount: 0,
       };
       const update = {
@@ -26,7 +26,7 @@ const deleteFund = async (req, res) => {
   const { userId, fundId } = req.params;
   try {
     const user = await User.findById(userId);
-    user.funds = user.funds.filter(fund => fund.id !== fundId);
+    user.funds = user.funds.filter(fund => fund.id !== fundId); //delete fund from the array
     user.markModified('funds');
     await user.save();
     res.status(200).json({ message: 'Fund deleted successfully' });
@@ -39,10 +39,10 @@ async function withdrawFund(userId, fundId) {
     try {
       const user = await User.findById(userId);
       const fund = user.funds.find(fund => fund.id === fundId);
-      user.budget += fund.raisedAmount;
-      user.funds = user.funds.filter(fund => fund.id !== fundId);
+      user.budget += fund.raisedAmount; //add the amount raised to the badget
+      user.funds = user.funds.filter(fund => fund.id !== fundId); //delete from funds array
       user.markModified('funds');
-      await user.save();
+      await user.save(); //save changes
     } catch (err) {
       console.log(err.message);
     }

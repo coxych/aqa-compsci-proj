@@ -8,7 +8,7 @@ router.get('/income', expincController.income_get);
 router.get('/profile', expincController.profile_get);
 router.get('/expenses', expincController.expenses_get);
 router.get('/addbudget', expincController.addbudget_get);
-router.get('/overview', expincController.overview_get);
+
 
 router.post('/addsalary', expincController.addsalary_post);
 router.post('/expenses', expincController.expenses_post);

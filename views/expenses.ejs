@@ -3,14 +3,15 @@
 <header>
   <h2>HERE YOU CAN MANAGE YOUR EXPENSES</h2>
 </header>
-<h2>Your current budget = <%= user.budget %> £</h2>
+<h2>Your current budget = <%= user.budget.toFixed(2) %> £</h2> <!--display budget with 2 decimal places using EJS-->
 <h3>You can add your expenses here</h3>
 <div class="row-layout">
   <br>
-  <form action="/expenses" method="post">
+  <form action="/expenses" method="post"> 
     <label for="amount">Amount</label>
-    <input type="number" step="0.1" name="amount" required>
+    <input type="number" step="0.01" name="amount" required>
     <label for="date">Date</label>
+    <!-- here we use the new Date().toISOString().split('T')[0] to get the current date in the format that the input type date requires -->
     <input type="date" name="date" value="<%= new Date().toISOString().split('T')[0] %>" required>
     <label for="category">Category</label>
     <input type="text" name="category" required>
@@ -20,21 +21,21 @@
   </form>
 
   <script>
-    const form = document.querySelector('form');
+    const form = document.querySelector('form'); //grab the form
     form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const amount = form.amount.value;
-      const date = form.date.value;
-      const category = form.category.value;
-      const description = form.description.value;
+      e.preventDefault(); 
+      const amount = form.amount.value; //get the amount value
+      const date = form.date.value; //get the date value
+      const category = form.category.value; //get the category
+      const description = form.description.value; //get the description
       try {
-        const res = await fetch('/expenses', {
+        const res = await fetch('/expenses', { //sending post req to server
           method: 'POST',
           body: JSON.stringify({ amount, date, category, description }),
           headers: { 'Content-Type': 'application/json' }
         });
         const data = await res.json();
-        if (data) {
+        if (data) { // if there is a response refresh expenses
           location.assign('/expenses');
         }
       } catch (err) {
@@ -63,14 +64,15 @@
 <div class="row-layout">
 <form action="/addsubs" method="post">
   <label for="amount">Amount</label>
-  <input type="number" step="0.1" name="amount" required>
+  <input type="number" step="0.01" name="amount" required>
   <label for="howoften">How often</label>
-  <select name="howoften" id="howoften">
+  <select name="howoften" id="howoften"> <!-- select bar which allows to choose frequency of payment -->
     <option value="daily">Daily</option>
     <option value="weekly">Weekly</option>
     <option value="monthly">Monthly</option>
   </select>
   <label for="date">Next date of payment</label>
+  <!-- again conversion of current data into the required format -->
   <input type="date" name="date" value="<%= new Date().toISOString().split('T')[0] %>" required>
   <label for="category">Category</label>
   <input type="text" name="category" required>
@@ -80,15 +82,16 @@
 </form>
 <script>
   const form2 = document.querySelector('form');
-  form2.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  form2.addEventListener('submit', async (e) => { //adds submit button listener to form
+    e.preventDefault(); //default action prevention as it is reloading the page
+    //getting values from form
     const amount = form2.amount.value;
     const date = form2.date.value;
     const howoften = form2.howoften.value;
     const category = form2.category.value;
     const description = form2.description.value;
     try {
-      const res = await fetch('/addsubs', {
+      const res = await fetch('/addsubs', { //post req sending to server
         method: 'POST',
         body: JSON.stringify({ amount, date, category, description, }),
         headers: { 'Content-Type': 'application/json' }
@@ -100,9 +103,10 @@
 </script>
 <div class="scroll-r">
   <h2>All you subscriptions and constant expenses</h2>
-  <% user.subs.reverse().forEach((sub) => { %>
+  <% user.subs.reverse().forEach((sub) => { %> <!-- reverse as subs were in wrong order when displayed -->
   <div class="row-layout">
     <li>
+      <!-- displaying of data from sub object in subs array -->
       <p>Amount: <%= sub.amount %> £</p>
       <p>Next date: <%= sub.date %></p>
       <p>Category: <%= sub.category %></p>
@@ -112,6 +116,7 @@
       <% } else {%>
         <p></p>
       <% } %>
+      <!-- delete button which contains id and sub id in itself for further delete req -->
       <button class="btn delete-btn" data-id="<%= sub.id%>" data-usid="<%= user._id %>">DELETE</button>
     </li>
   </div>
@@ -119,18 +124,20 @@
 </div>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.delete-btn').forEach(button => {
-      button.addEventListener('click', function() {
+    document.querySelectorAll('.delete-btn').forEach(button => { //for each as there might be several subs
+      button.addEventListener('click', function() { //listener to delet button
+        //extraction of data from delete button (user id and sub id)
         const subId = this.getAttribute('data-id');
         const userId = this.getAttribute('data-usid');
         try {
-          fetch(`/user/${userId}/sub/${subId}`, {
+          fetch(`/user/${userId}/sub/${subId}`, { //delete req sending 
+            //this req contains data in itself as it is delete req
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
             }
           }).then(() => {
-            location.reload();
+            location.reload(); //reload of bage after req is sent
           });
         } catch {
           console.log('failed to delete sub');

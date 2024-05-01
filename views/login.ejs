@@ -11,38 +11,38 @@
     <button class="btn">Log in</button>
 </form>
 <script>
-    const form = document.querySelector('form');
-    const emailError = document.querySelector('.email.error');
-    const passwordError = document.querySelector('.password.error');
+    const form = document.querySelector('form'); //grab the form
+    const emailError = document.querySelector('.email.error'); //grab the error
+    const passwordError = document.querySelector('.password.error'); //grab the error 
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+    form.addEventListener('submit', async (e) => { //listen for the submit event
+      e.preventDefault(); //prevent the default action
       //reset errors
       emailError.textContent = '';
       passwordError.textContent = '';
   
       // get values
-      const email = form.email.value;
-      const password = form.password.value;
+      const email = form.email.value; //get the email value
+      const password = form.password.value; //get the password value
   
       try {
-        const res = await fetch('/login', { 
+        const res = await fetch('/login', { //send the data to the server using post request
           method: 'POST', 
           body: JSON.stringify({ email, password }),
           headers: {'Content-Type': 'application/json'}
         });
-        const data = await res.json();
+        const data = await res.json(); //get the response from the server
         console.log(data);
         if (data.errors){
             emailError.textContent = data.errors.email;
             passwordError.textContent = data.errors.password;
         }
         if (data.user) {
-            location.assign('/')
+            location.assign('/') //redirect to the home page if the res is user
         }
       }
       catch (err) {
-        console.log(err);
+        console.log(err); //log the error
       }
     });
 </script>

@@ -23,20 +23,26 @@ module.exports.addfunds_post = ('/addfunds', async (req, res) => {
 module.exports.updatefunds_post = ('/updatefunds', async (req, res) => {
     const { type, amount, fundId } = req.body;
     try {
-        const id = getUserId(req);
+        const id = getUserId(req); //get id from req
         id.then(async (id) => {
             const user = await User.findById(id);
-            const fund = user.funds.find(fund => fund.id === fundId);
+            const fund = user.funds.find(fund => fund.id === fundId); //finds the fund by the unique id created previously
+            if (fund.raisedAmount < parseFloat(amount) && type === 'withdraw') {
+                res.redirect('/funds');
+                return;
+            }
             if (fund) {
                 if (type === 'add') {
+                    //addition from budget
                     fund.raisedAmount += parseFloat(amount);
                     user.budget -= parseFloat(amount);
                 }else{
+                    //putting money from fund on budget
                     fund.raisedAmount -= parseFloat(amount);
                     user.budget += parseFloat(amount);
                 }
                 user.markModified('funds');
-                await user.save();
+                await user.save(); //save changes
                 res.status(200).redirect('/funds'); 
             } else {
                 res.status(404).json({ message: 'Fund not found' });
@@ -48,9 +54,9 @@ module.exports.updatefunds_post = ('/updatefunds', async (req, res) => {
 });
 
 module.exports.withdrawfund_withdraw = ('/user/:userId/fund/:fundId/withdraw', async (req, res) => {
-    const { userId, fundId } = req.params;
+    const { userId, fundId } = req.params; //extracting data from the req parameters
     try{
-        withdrawFund(userId, fundId)
+        await withdrawFund(userId, fundId)
         res.status(200).redirect('/funds');
     }catch(err){
         console.log(err);

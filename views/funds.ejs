@@ -21,9 +21,11 @@
     const form = document.querySelector('form');
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      //get values from the form
       const amount = form.amount.value;
       const name = form.name.value;
       try {
+        //send post req
         const res = await fetch('/addfunds', {
           method: 'POST',
           body: JSON.stringify({ amount, name }),
@@ -43,13 +45,16 @@
     <h2>Your current funds</h2>
     <% user.funds.reverse().forEach((fund) => { %>
     <li>
+      <!-- Representation of funds on the right of the page-->
       <p>To raise: <%= fund.amount %> £</p>
       <div class="fundBarContainer" data-name="<%= fund.name %>" data-amount="<%= fund.amount %>" data-raised="<%= fund.raisedAmount %>">
+        <!-- fundBar is the green filling part of funds-->
         <div class="fundBar" style="width: 0%;"></div>
         <p> <%= fund.name %> and raised: <%= fund.raisedAmount%></p>
+        <!-- if some mone is added to fund excess button instead of delete appears-->
         <p class="excess"></p>
         <% if (fund.raisedAmount > 0){ %>
-          <button class="btn excess-btn"  data-usid="<%= user._id %>" data-id="<%= fund.id %>" style="display:none">Withdraw fund</button>
+          <button class="btn excess-btn"  data-usid="<%= user._id %>" data-id="<%= fund.id %>" display="" >Withdraw fund</button>
         <% } else { %>
           <button class="btn delete-btn" data-usid="<%= user._id %>" data-id="<%= fund.id %>">DELETE</button>
         <% } %>
@@ -59,17 +64,21 @@
           document.querySelectorAll('.fundBarContainer').forEach(container => {
             const toRaise = parseInt(container.getAttribute('data-amount'), 10);
             const raised = parseInt(container.getAttribute('data-raised'), 10);
-
+            // "?" states if there is some money then next operation should be performed
             const percentageRaised = raised > 0 ? (raised / toRaise) * 100 : 0;
-            if (percentageRaised > 100) {
-              container.querySelector('.fundBar').style.width = '100%';
-              container.querySelector('.excess').textContent = `You have raised more than the goal, excess: ${raised - toRaise} £`;
+              if (percentageRaised >= 100) { // this is needed as CSS can excess 100% and go out of boundaries of container
+                container.querySelector('.fundBar').style.width = '100%';
+                container.querySelector('.excess').textContent = `You have raised more than the goal, excess: ${raised - toRaise} £`;
+              } else {
+                container.querySelector('.fundBar').style.width = `${percentageRaised}%`; 
+              }
+              //excess btn is for withdrawing money
               container.querySelector('.excess-btn').style.display = 'block';
               document.querySelectorAll('.excess-btn').forEach(button => {
                   button.addEventListener('click', async function() {
                   const fundId = this.getAttribute('data-id');
                   const userId = this.getAttribute('data-usid');
-                  try {
+                  try { //post req is sent withdraw
                       await fetch(`/user/${userId}/fund/${fundId}/withdraw`, {
                       method: 'POST',
                       headers: {
@@ -83,15 +92,13 @@
                   }
                 });
               });
-            } else {
-              container.querySelector('.fundBar').style.width = `${percentageRaised}%`;
-            }
           });
+
           document.querySelectorAll('.delete-btn').forEach(button => {
             button.addEventListener('click', function() {
               const fundId = this.getAttribute('data-id');
               const userId = this.getAttribute('data-usid');
-              try {
+              try { //delete req
                 fetch(`/user/${userId}/fund/${fundId}`, {
                   method: 'DELETE',
                   headers: {
@@ -106,6 +113,25 @@
             });
           });  
         });
+        document.querySelectorAll('.delete-btn').forEach(button => {
+          button.addEventListener('click', async function() {
+            const fundId = this.getAttribute('data-id');
+            const userId = this.getAttribute('data-usid');
+            try {
+              // Send delete request
+              await fetch(`/user/${userId}/fund/${fundId}`, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              });
+              // Reload the page after deletion
+              location.reload();
+            } catch {
+              console.log('Failed to delete fund');
+            }
+          });
+        });
       </script>
     </li>
     <% }) %>
@@ -114,17 +140,20 @@
 <br>  
 <br>
 <div>
+  <% if (user.funds.length > 0) { %>
   <h2>You can add or withdraw money from your funds here</h2>
   <p>The amount would be added or taken from the budget</p>
   <br>
   <form action="/updatefunds" method="post">
     <label for="fund">Choose a fund to update</label>
+    <!-- gives you list of all existing funds-->
     <select name="fundId" id="fundId"> 
       <% user.funds.reverse().forEach((fund) => { %>
       <option value="<%= fund.id %>"><%= fund.name %></option>
       <% }) %>
     </select>
     <label for="type">Choose a type</label>
+    <!-- either withdraw money or add on fund-->
     <select name="type" id="type">
       <option value="add">Add</option>
       <option value="withdraw">Withdraw</option>
@@ -140,18 +169,22 @@
       const fundId = form2.fundId.value;
       const type = form2.type.value;
       const amount = form2.amount.value;
-      try {
-        const res = await fetch('/updatefunds', {
-          method: 'POST',
-          body: JSON.stringify({ fundId, type, amount }),
-          headers: { 'Content-Type': 'application/json' }
-        });
-        location.assign('/funds');
-      } catch (err) {
-        console.log(err.message);
-      }
-    });
+      const fund = user.funds.find(f => f.id === fundId);
+      console.log(type)
+        // Proceed with the withdrawal or addition
+        try {
+          const res = await fetch('/updatefunds', {
+            method: 'POST',
+            body: JSON.stringify({ fundId, type, amount }),
+            headers: { 'Content-Type': 'application/json' }
+          });
+          location.assign('/funds');
+        } catch (err) {
+          console.log(err.message);
+        }
+      });
   </script>
+  <% } %>
 </div>
 
 <%- include('partials/footer'); -%>

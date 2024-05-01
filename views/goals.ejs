@@ -11,6 +11,7 @@
 <br>
 <h2>Your current budget: <%= user.budget %> £</h2>
 <br>
+<!-- checks if user has at least 1 sub and 1 salary so advice can be calculated-->
 <% if (user.subs.length > 0 && user.salaries.length > 0 && user.goals.length == 0) { %>
 <h2>Add your first goal</h2>  
 <br>
@@ -27,7 +28,7 @@
           e.preventDefault();
           const date = form.date.value;
           const amount = form.amount.value;
-          try {
+          try { //addgoals post req
             const res = await fetch('/addgoals', {
               method: 'POST',
               body: JSON.stringify({ amount, date }),
@@ -53,8 +54,7 @@
     <p>Amount to save: <%= goal.amount %> £</p>
     <p>Date until which to save: <%= goal.date %></p>
     <div class="row-layout">
-
-
+      <!-- if goal is new and no money save delete button is revealed-->
     <button class="btn delete-btn" 
     <% if (goal.savedAmount == 0) {%>
       style="display: block"
@@ -64,7 +64,7 @@
     data-usid="<%= user._id %>" data-id="<%= goal.id %>">
     DELETE</button>
 
-
+      <!-- if goal is updated then display calculate btn-->
     <button class="btn calculate-btn"
     <% if (!goal.updated) {%>
       style="display: block"
@@ -73,14 +73,14 @@
     <%}%>
     data-usid="<%= user._id %>" data-id="<%= goal.id %>">
     CALCULATE</button>
-
+      <!-- user can either hide of show the goal at the top of the page-->
     <button class="btn hideshow-btn" data-usid="<%= user._id %>">
       <% if (!user.ShowGoal) { %>
         SHOW AT THE TOP</button>
       <% } else { %>
         HIDE</button>
       <% } %>
-
+        <!-- withdraw goal button is there if some money is saved-->
     <button class="btn withdraw-btn"
     <% if (goal.savedAmount > 0) { %>
       style="display: block"
@@ -90,6 +90,7 @@
     data-usid="<%= user._id %>" data-id="<%= goal.id %>">
     WITHDRAW</button>
     </div>
+    <!-- this chunk of code displays financial advie for the user-->
     <% if (goal.updated) {%>
       <p>We analysed your goal:</p>
       <% if (goal.calcValue > 0) {%>
@@ -113,7 +114,7 @@
           const amount = form2.amount.value;
           const goalId = form2.querySelector('button').getAttribute('data-id');
           const userId = form2.querySelector('button').getAttribute('data-usid');
-          try {
+          try { //money addition through the goal page
             const res = await fetch(`/user/${userId}/goal/${goalId}/add`, {
               method: 'POST',
               body: JSON.stringify({ amount }),
@@ -136,7 +137,7 @@
       button.addEventListener('click', async function() {
         const goalId = this.getAttribute('data-id');
         const userId = this.getAttribute('data-usid');
-        try {
+        try { //deleting the goal
           await fetch(`/user/${userId}/goal/${goalId}/delete`, {
             method: 'POST',
             headers: {
@@ -153,7 +154,7 @@
     document.querySelector('.calculate-btn').addEventListener('click', async function() {
       const goalId = this.getAttribute('data-id');
       const userId = this.getAttribute('data-usid');
-      try {
+      try { //calculate button which initialise the function to calculate the advice 
         await fetch(`/user/${userId}/goal/${goalId}/calculate`, {
           method: 'POST',
           headers: {
@@ -169,7 +170,7 @@
     document.querySelector('.withdraw-btn').addEventListener('click', async function() {
       const goalId = this.getAttribute('data-id');
       const userId = this.getAttribute('data-usid');
-      try {
+      try { //withdrawing goal
         await fetch(`/user/${userId}/goal/${goalId}/withdraw`, {
           method: 'POST',
           headers: {
@@ -184,7 +185,7 @@
     });
     document.querySelector('.hideshow-btn').addEventListener('click', async function() {
       const userId = this.getAttribute('data-usid');
-      try {
+      try { //hiding/showing goal
         await fetch(`/user/${userId}/hideshowgoal`, {
           method: 'POST',
           headers: {
@@ -198,9 +199,4 @@
       }
     })
   </script>
-
-
-
-
-
 <%- include('partials/footer'); -%>

@@ -16,10 +16,12 @@
   <input type="text" name="category" required>
   <label for="description">Description (optional)</label>
   <input type="text" name="description" >
+  <!-- this is the incomeaddition form and if there is a goal new parameter to fill appears-->
   <% if (user.goals.length > 0){ %>
     <label for="forgoal">Percentage of income to goal (optional)</label>
     <input type="number" min="1" max="100" name="percentage"/>
   <% } %>
+  <!-- this parameter is percentage from income to add to the goal-->
   <button class="btn" type="submit">Add</button>
 </form>
 <script>

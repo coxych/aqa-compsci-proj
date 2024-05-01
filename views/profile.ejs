@@ -7,7 +7,7 @@
     <p>Email: <%= user.email %></p>
     <br>
     <p>  <% if(user.budget == 0){%> 
-        <p>You haven't add your starting budget yet, <a class="hypertext"href="/addbudget">ADD</a></p>
+        <p>You haven't added your starting budget yet, <a class="hypertext"href="/addbudget">ADD</a></p>
         <%} else {%> 
         <p>Your budget is <%= user.budget %> £, <a class="hypertext"href="/addbudget" >change?</a></p><%} %> 
     </p>

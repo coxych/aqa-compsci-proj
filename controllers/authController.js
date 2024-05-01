@@ -20,7 +20,9 @@ const handleErrors = (err) => {
 };
 
 // Utility for creating JWT tokens
+// This token will be used in cookies to authenticate users
 const maxAge = 3 * 24 * 60 * 60; // 3 days in seconds
+// secrethashing is the secret key used to hash the user ID
 const createToken = (id) => jwt.sign({ id }, 'secrethashing', { expiresIn: maxAge });
 
 // Controller actions
@@ -39,24 +41,24 @@ const logout_get = (req, res) => {
 // Handle user signup
 const signup_post = async (req, res) => {
   try {
-    const user = await User.create(req.body);
-    const token = createToken(user._id);
-    res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
-    res.status(201).json({ user: user._id });
-  } catch (err) {
-    res.status(400).json({ errors: handleErrors(err) });
+    const user = await User.create(req.body); // Create a new user using the User model
+    const token = createToken(user._id); // Create a JWT token and hash the user ID
+    res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 }); // Set the JWT token in a cookie
+    res.status(201).json({ user: user._id }); // Respond with the user ID in JSON format (the res.user)
+  } catch (err) { 
+    res.status(400).json({ errors: handleErrors(err) }); // Handle any errors using the utility function
   }
 };
 
 // Handle user login
 const login_post = async (req, res) => {
   try {
-    const user = await User.login(req.body.email, req.body.password);
-    const token = createToken(user._id);
-    res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 });
-    res.status(200).json({ user: user._id });
+    const user = await User.login(req.body.email, req.body.password); // Log the user in using the User model
+    const token = createToken(user._id); // Create a JWT token and hash the user ID
+    res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 }); // Set the JWT token in a cookie
+    res.status(200).json({ user: user._id }); // Respond with the user ID in JSON format (the res.user)
   } catch (err) {
-    res.status(400).json({ errors: handleErrors(err) });
+    res.status(400).json({ errors: handleErrors(err) }); // Handle any errors using the utility function
   }
 };
 

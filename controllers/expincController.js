@@ -1,3 +1,4 @@
+const { merge } = require('lodash');
 const { getUserId } = require('../middleware/authMiddleware');
 const { addExpense, addIncome, addSalary, addSubs } = require('../middleware/expincMiddleware');
 const User = require('../models/user');
@@ -16,12 +17,13 @@ module.exports.addsalary_post = ('/addsalary', async (req, res) => {
     }
 });
 module.exports.addsubs_post = ('/addsubs', async (req, res) => {
+    //get data from the req
     const { date, category, howoften, amount, description } = req.body;
     try {
-        const id = getUserId(req);
-        const newSub = { date, category, amount, description, howoften };
+        const id = getUserId(req); //get user id (same function as previously)
+        const newSub = { date, category, amount, description, howoften }; // crete newsub object
         id.then(async (id) => {
-            await addSubs(id, newSub)
+            await addSubs(id, newSub) //add sub to subs array
             res.status(200).redirect('/expenses');
 
         }); 
@@ -30,13 +32,15 @@ module.exports.addsubs_post = ('/addsubs', async (req, res) => {
     }
 });
 module.exports.expenses_post = ('/expenses', async (req, res) => {
-    const { date, category, amount, description } = req.body;
+    // get data from request
+    const { date, category, amount, description } = req.body; 
     try {
-        const id = getUserId(req);
+        const id = getUserId(req); //this function gets id of user who sends the request
         const newExpense = { date, category, amount, description };
+        // as here id is a promise .then() is used to wait for it to resolve
         id.then(async (id) => {
-            await addExpense(id, newExpense);
-            res.status(200).json({message: 'Expense added'});
+            await addExpense(id, newExpense); //function which pushes expense to array for user with this id
+            res.status(200).json({message: 'Expense added'}); //res sending
         });
     } catch (err) {
         console.log(err);
@@ -56,7 +60,7 @@ module.exports.addbudget_post = ('/addbudget', async (req, res) => {
     }
 });
 module.exports.income_post = ('/income', async (req, res) => {
-    const { date, amount, description, category, percentage } = req.body;
+    const { date, amount, description, category, percentage } = req.body; 
     const newIncome = { date, amount, description, category, percentage};
     try {
         const id = getUserId(req);
@@ -84,10 +88,6 @@ module.exports.profile_get = (req, res) => {
 module.exports.expenses_get = (req, res) => {
     res.render('expenses'); // Render the 'expenses' view from the 'expense' folder as HTML
 }
-module.exports.overview_get = (req, res) => {
-    res.render('overview');
-}
-
 
 module.exports.deletesalary_delete = async (req, res) => {
     const { userId, salaryId } = req.params;
@@ -112,7 +112,7 @@ module.exports.deletesub_delete = async (req, res) => {
     try {
         // Find the user by their ID
         const user = await User.findById(userId);
-
+        //remove the sub from the user's subs array
         user.subs = user.subs.filter(sub => sub.id !== subId);
         // Save the user document after modification
         await user.save();
